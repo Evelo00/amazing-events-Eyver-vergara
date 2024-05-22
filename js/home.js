@@ -197,6 +197,9 @@ const data = {
 
 let cardsHome = document.getElementById("allCards");
 let row = document.createElement("div");
+let categories = [...new Set(data.events.map((event) => event.category))];
+let checkboxContainer = document.getElementById("checkbox-container");
+let searchInput = document.getElementById("search");
 row.className = "row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center";
 
 for (let i = 0; i < data.events.length; i++) {
@@ -221,5 +224,64 @@ for (let i = 0; i < data.events.length; i++) {
   col.appendChild(card);
   row.appendChild(col);
 }
+
+const filterEvents = () => {
+  const searchQuery = searchInput.value.toLowerCase();
+  const selectedCategories = Array.from(
+    document.querySelectorAll(".category-checkbox:checked")
+  ).map((cb) => cb.value);
+
+  const filteredEvents = data.events.filter((event) => {
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(event.category);
+    const matchesSearch = event.name.toLowerCase().includes(searchQuery);
+    return matchesCategory && matchesSearch;
+  });
+
+  renderEvents(filteredEvents);
+};
+
+categories.forEach((category, index) => {
+  let divCol = document.createElement("div");
+  divCol.className = "col-md-auto";
+
+  let divCheck = document.createElement("div");
+  divCheck.className = "form-check form-check-inline";
+
+  let checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "form-check-input category-checkbox";
+  checkbox.id = `inlineCheckbox${index}`;
+  checkbox.value = category;
+
+  let label = document.createElement("label");
+  label.className = "form-check-label";
+  label.htmlFor = `inlineCheckbox${index}`;
+  label.textContent = category;
+
+  divCheck.appendChild(checkbox);
+  divCheck.appendChild(label);
+  divCol.appendChild(divCheck);
+  checkboxContainer.appendChild(divCol);
+
+  checkbox.addEventListener("change", filterEvents);
+});
+
+// if (filterEvents.legth === 0) {
+//   let messageError = document.createElement("p");
+//   messageError.textContent = "Ningun evento coincide con tu busqueda";
+//   cardsHome.appendChild(messageError);
+// } else {
+//   renderEvents(filterEvents);
+// }
+
+// searchButton.addEventListener("click", filterEvents);
+
+// document.querySelectorAll(".category-checkbox").forEach((checkbox) => {
+//   checkbox.addEventListener("change", filterEvents);
+// });
+
+// renderEvents(data.events);
 
 cardsHome.appendChild(row);
