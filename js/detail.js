@@ -195,116 +195,44 @@ const data = {
   ],
 };
 
-let cardsHome = document.getElementById("pastCard");
-let categories = [...new Set(data.events.map((event) => event.category))];
-let checkboxContainer = document.getElementById("checkbox-container");
-let searchInput = document.getElementById("search");
-let searchButton = document.getElementById("search-button");
-let renderEvents = (events) => {
-  row.innerHTML = "";
-  if (events.length === 0) {
-    let col = document.createElement("div");
-    col.className = "col-12 text-center";
-    col.innerHTML = `
-      <div class="alert alert-danger" role="alert w-100" center style="margin-top: 20px;">
-        404 Not Found - Evento no encontrado, por favor intenta con otros criterios.
-        <img src="https://t3.ftcdn.net/jpg/01/99/75/26/240_F_199752659_5oOiVrQHHvfRg6krX4pnmGpldp9Twvfs.jpg" class="img-fluid" alt="404 Not Found">
-      </div>
-    `;
-    row.appendChild(col);
-  } else {
-    for (let i = 0; i < events.length; i++) {
-      let col = document.createElement("div");
-      col.className = "col";
-
-      let card = document.createElement("div");
-      card.className = "card h-100";
-      card.innerHTML = `
-        <img src="${events[i].image}" class="card-img-top img-fluid object-fit-cover" alt="${events[i].name}" style="max-height: 200px;">
-        <div class="card-body">
-            <h5 class="card-title text-center">${events[i].name}</h5>
-            <p class="card-text">
-                ${events[i].description}
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-                <p class="m-0">Price: <strong>US ${events[i].price} USD</strong></p>
-                <a href="./details.html?id=${events[i]._id}" class="btn btn-primary">Details</a>
-            </div>
+let id = window.location.href;
+id = new URL(id).searchParams.get("id");
+let container = document.getElementById("detailsEvent");
+let card = document.createElement("div");
+card.className = "card mb-3 w-100 h-100";
+for (let event of data.events) {
+  if (event._id == id) {
+    let assistanceText = event.assistance
+      ? `<p><strong>Assistance:</strong> ${event.assistance}</p>`
+      : "";
+    let estimateText = event.estimate
+      ? `<p><strong>Estimate:</strong> ${event.estimate}</p>`
+      : "";
+    card.innerHTML = `
+    <div class="card d-flex flex-md-row flex-column">
+        <div class="d-flex flex-column justify-content-center p-3">
+            <img src="${event.image}" class="img-fluid rounded mx-auto" alt="${event.name}" style="max-width: 300px;">
         </div>
-      `;
-      col.appendChild(card);
-      row.appendChild(col);
-    }
+        <div>
+            <div class="card-body">
+            <h5 class="card-title">${event.name}</h5>
+            <p class="card-text">${event.description}</p>
+            <p class="card-text">
+                <small class="text-muted">
+                <strong>Date:</strong> ${event.date}<br>
+                <strong>Time:</strong> 10:00 am<br>
+                <strong>Place:</strong> ${event.place}<br>
+                <strong>Category:</strong> ${event.category}<br>
+                <strong>Capacity:</strong> ${event.capacity}<br>
+                ${estimateText}
+                ${assistanceText}
+                <strong>Price:</strong> $${event.price}
+                </small>
+            </p>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+    </div>
+  `;
+    container.appendChild(card);
   }
-  cardsHome.appendChild(row);
-};
-let comparisonDate = new Date(2023, 0, 1);
-
-let row = document.createElement("div");
-row.className = "row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center";
-
-const filterEvents = () => {
-  const searchQuery = searchInput.value.toLowerCase();
-  const selectedCategories = Array.from(
-    document.querySelectorAll(".category-checkbox:checked")
-  ).map((cb) => cb.value);
-
-  const comparisonDate = new Date(2023, 0, 1);
-
-  const filteredEvents = data.events.filter((event) => {
-    const eventDate = new Date(event.date);
-    const isUpcoming = eventDate < comparisonDate;
-    const matchesCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(event.category);
-    const matchesSearch = event.name.toLowerCase().includes(searchQuery);
-    return isUpcoming && matchesCategory && matchesSearch;
-  });
-
-  renderEvents(filteredEvents);
-};
-
-categories.forEach((category, index) => {
-  let divCol = document.createElement("div");
-  divCol.className = "col-md-auto";
-
-  let divCheck = document.createElement("div");
-  divCheck.className = "form-check form-check-inline";
-
-  let checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.className = "form-check-input category-checkbox";
-  checkbox.id = `inlineCheckbox${index}`;
-  checkbox.value = category;
-
-  let label = document.createElement("label");
-  label.className = "form-check-label";
-  label.htmlFor = `inlineCheckbox${index}`;
-  label.textContent = category;
-
-  divCheck.appendChild(checkbox);
-  divCheck.appendChild(label);
-  divCol.appendChild(divCheck);
-  checkboxContainer.appendChild(divCol);
-
-  checkbox.addEventListener("change", filterEvents);
-});
-
-searchButton.addEventListener("click", (event) => {
-  event.preventDefault();
-  filterEvents();
-});
-
-document.querySelectorAll(".category-checkbox").forEach((checkbox) => {
-  checkbox.addEventListener("change", filterEvents);
-});
-
-let  pastEvents = data.events.filter((event) => {
-  let eventDate = new Date(event.date);
-  let comparisonDate = new Date(2023, 0, 1); 
-  return eventDate < comparisonDate;
-});
-
-renderEvents(pastEvents);
-
-cardsHome.appendChild(row);
+}

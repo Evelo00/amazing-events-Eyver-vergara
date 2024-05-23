@@ -229,7 +229,7 @@ let renderEvents = (events) => {
             </p>
             <div class="d-flex justify-content-between align-items-center">
                 <p class="m-0">Price: <strong>US ${events[i].price} USD</strong></p>
-                <a href="./details.html" class="btn btn-primary">Details</a>
+                <a href="./details.html?id=${events[i]._id}" class="btn btn-primary">Details</a>
             </div>
         </div>
       `;
